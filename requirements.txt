@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+playwright
+playwright-stealth
+PyPDF2
+langchain
+langchain-community
+requests
+beautifulsoup4
+pandas
+python-multipart

@@ -1,0 +1,24 @@
+# Ambientes Virtuales
+venv/
+env/
+.env
+.venv/
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos subidos o temporales
+uploaded_cv.pdf
+*.pdf
+
+# Logs y bases de datos locales
+*.log
+*.sqlite3
+
+# IDEs y Editores
+.vscode/
+.idea/
+*.swp
+.DS_Store

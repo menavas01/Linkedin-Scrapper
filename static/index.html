@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Job Matcher</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-green: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color), #020617);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: -webkit-linear-gradient(45deg, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .card {
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+        }
+
+        button.primary-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        button.primary-btn:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+        }
+
+        button.primary-btn:disabled {
+            background-color: #475569;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Form Inputs */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: var(--primary-color);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .progress-container {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .progress-bar-bg {
+            background-color: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .logs {
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 1rem;
+            height: 150px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            border: 1px solid var(--border-color);
+        }
+
+        .logs p {
+            margin-bottom: 0.2rem;
+        }
+
+        .results-container {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .job-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            border-color: rgba(96, 165, 250, 0.5);
+        }
+
+        .job-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #e2e8f0;
+        }
+
+        .job-company {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .job-score {
+            display: inline-block;
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .job-explanation {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .job-link {
+            display: block;
+            text-align: center;
+            background-color: transparent;
+            color: #60a5fa;
+            border: 1px solid #60a5fa;
+            padding: 0.75rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .job-link:hover {
+            background-color: rgba(96, 165, 250, 0.1);
+        }
+
+        /* Spinner animation */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .drop-zone.dragover {
+            border-color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--text-main);
+        }
+        
+        .drop-zone input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>AI Job Matcher</h1>
+        <p class="subtitle">Finding the best LinkedIn jobs for your CV using Local AI</p>
+    </header>
+
+    <div class="container">
+        <!-- Phase 1: Upload CV -->
+        <div class="card" id="phase1Card">
+            <h2>1. Upload your CV</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; margin-top: 0.5rem;">Upload your CV and let the AI extract the best roles and location for you.</p>
+            <div id="dropZone" class="drop-zone" onclick="document.getElementById('cvFile').click()">
+                <p id="dropText">Drag and drop your CV (PDF) here, or click to select</p>
+                <input type="file" id="cvFile" accept=".pdf" />
+            </div>
+
+            <button id="analyzeBtn" class="primary-btn" onclick="analyzeCV()" disabled>
+                <div id="analyzeSpinner" class="spinner"></div>
+                <span id="analyzeBtnText">Analyze CV</span>
+            </button>
+        </div>
+
+        <!-- Phase 2: Edit Params & Scrape -->
+        <div class="card" id="phase2Card" style="display: none;">
+            <h2>2. Review AI Recommendations</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem; margin-top: 0.5rem;">Edit the roles or location if needed. The AI will search the latest jobs for each role.</p>
+            
+            <div class="form-group">
+                <label for="locationInput">Location</label>
+                <input type="text" id="locationInput" placeholder="e.g. Buenos Aires, Argentina">
+            </div>
+            
+            <div class="form-group">
+                <label for="rolesInput">Target Roles (comma-separated)</label>
+                <input type="text" id="rolesInput" placeholder="e.g. Data Engineer, Python Developer">
+            </div>
+
+            <button id="startBtn" class="primary-btn" onclick="startScraping()">
+                <div id="btnSpinner" class="spinner"></div>
+                <span id="btnText">Start Job Search</span>
+            </button>
+
+            <div id="progressContainer" class="progress-container">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span id="statusText">Initializing...</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progressBar" class="progress-bar-fill"></div>
+                </div>
+                <div id="logsContainer" class="logs"></div>
+            </div>
+        </div>
+
+        <h2 id="resultsTitle" style="display: none; margin-bottom: 1rem; font-weight: 600;">Top Matches</h2>
+        <div id="resultsContainer" class="results-container">
+            <!-- Job cards will be injected here -->
+        </div>
+    </div>
+
+    <script>
+        let pollInterval;
+        let uploadedFile = null;
+        let cvSummary = "";
+
+        const dropZone = document.getElementById('dropZone');
+        const cvFileInput = document.getElementById('cvFile');
+        const dropText = document.getElementById('dropText');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+
+        // Drag and drop setup
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+        cvFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (file.type !== "application/pdf") {
+                alert("Please upload a PDF file.");
+                return;
+            }
+            uploadedFile = file;
+            dropText.innerText = `Selected: ${file.name}`;
+            dropZone.style.borderColor = "var(--accent-green)";
+            analyzeBtn.disabled = false;
+        }
+
+        async function analyzeCV() {
+            if (!uploadedFile) return;
+
+            const btnText = document.getElementById('analyzeBtnText');
+            const spinner = document.getElementById('analyzeSpinner');
+            
+            analyzeBtn.disabled = true;
+            btnText.innerText = 'Analyzing with Local AI...';
+            spinner.style.display = 'block';
+
+            const formData = new FormData();
+            formData.append("file", uploadedFile);
+            
+            try {
+                const response = await fetch('/api/analyze_cv', { 
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                // Store summary
+                cvSummary = data.summary || "";
+                
+                // Populate Phase 2
+                document.getElementById('locationInput').value = data.location || "Buenos Aires, Argentina";
+                document.getElementById('rolesInput').value = (data.roles || []).join(", ");
+                
+                // Switch phases
+                document.getElementById('phase1Card').style.display = 'none';
+                document.getElementById('phase2Card').style.display = 'block';
+                
+            } catch (error) {
+                console.error("Error analyzing CV:", error);
+                alert("Failed to analyze CV. Is Ollama running?");
+                analyzeBtn.disabled = false;
+                btnText.innerText = 'Analyze CV';
+                spinner.style.display = 'none';
+            }
+        }
+
+        async function startScraping() {
+            const rawRoles = document.getElementById('rolesInput').value;
+            const roles = rawRoles.split(',').map(r => r.trim()).filter(r => r);
+            const location = document.getElementById('locationInput').value;
+
+            if (roles.length === 0 || !location) {
+                alert("Please provide at least one role and a location.");
+                return;
+            }
+
+            const startBtn = document.getElementById('startBtn');
+            const btnText = document.getElementById('btnText');
+            const btnSpinner = document.getElementById('btnSpinner');
+            const progressContainer = document.getElementById('progressContainer');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultsTitle = document.getElementById('resultsTitle');
+
+            // Reset UI
+            startBtn.disabled = true;
+            document.getElementById('locationInput').disabled = true;
+            document.getElementById('rolesInput').disabled = true;
+            btnText.innerText = 'Scraping LinkedIn...';
+            btnSpinner.style.display = 'block';
+            progressContainer.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            resultsTitle.style.display = 'none';
+            document.getElementById('logsContainer').innerHTML = '';
+            document.getElementById('progressBar').style.width = '0%';
+            
+            try {
+                const payload = {
+                    roles: roles,
+                    location: location,
+                    summary: cvSummary
+                };
+
+                const response = await fetch('/api/start', { 
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                
+                if (data.status === 'started' || data.status === 'already running') {
+                    pollInterval = setInterval(pollStatus, 1500);
+                }
+            } catch (error) {
+                console.error("Error starting job:", error);
+                alert("Failed to start job.");
+            }
+        }
+
+        async function pollStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                // Update Progress
+                document.getElementById('progressBar').style.width = data.progress + '%';
+                document.getElementById('progressText').innerText = data.progress + '%';
+                document.getElementById('statusText').innerText = `Status: ${data.status}`;
+                
+                // Update Logs
+                const logsDiv = document.getElementById('logsContainer');
+                logsDiv.innerHTML = data.logs.map(log => `<p>> ${log}</p>`).join('');
+                logsDiv.scrollTop = logsDiv.scrollHeight;
+
+                if (data.status === 'finished') {
+                    clearInterval(pollInterval);
+                    document.getElementById('btnText').innerText = 'Completed!';
+                    document.getElementById('btnSpinner').style.display = 'none';
+                    displayResults(data.results);
+                } else if (data.status === 'error') {
+                    clearInterval(pollInterval);
+                    alert("An error occurred. Check logs.");
+                }
+
+            } catch (error) {
+                console.error("Polling error:", error);
+            }
+        }
+
+        function displayResults(jobs) {
+            const container = document.getElementById('resultsContainer');
+            const title = document.getElementById('resultsTitle');
+            
+            container.innerHTML = '';
+            
+            if (jobs.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No matching jobs found.</p>';
+            } else {
+                jobs.forEach(job => {
+                    const card = document.createElement('div');
+                    card.className = 'job-card';
+                    card.innerHTML = `
+                        <div class="job-score">AI Match Score: ${job.score}/100</div>
+                        <h3 class="job-title">${job.title}</h3>
+                        <div class="job-company">${job.company}</div>
+                        <p class="job-explanation">${job.explanation}</p>
+                        <a href="${job.url}" target="_blank" class="job-link">View on LinkedIn</a>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+            
+            title.style.display = 'block';
+            container.style.display = 'grid';
+        }
+    </script>
+</body>
+</html>
