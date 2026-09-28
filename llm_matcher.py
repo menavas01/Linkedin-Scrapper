@@ -2,7 +2,6 @@ import re
 import json
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import PromptTemplate
-from cv_parser import extract_text_from_pdf
 
 # Make the model configurable. Llama3 is a solid default.
 OLLAMA_MODEL = "qwen2.5:14b"
@@ -76,8 +75,3 @@ def score_job(cv_summary: str, job_title: str, job_description: str) -> dict:
     except Exception as e:
         print(f"Error parsing LLM response: {result_text}")
         return {"score": 0, "explanation": "Failed to parse evaluation."}
-
-if __name__ == "__main__":
-    cv_text = extract_text_from_pdf("CV_ManuelNavas_Especialista_IT.pdf")
-    summary = summarize_cv(cv_text)
-    print("CV SUMMARY:\n", summary)

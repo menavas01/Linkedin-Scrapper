@@ -12,10 +12,3 @@ def extract_text_from_pdf(pdf_path: str) -> str:
             text += page.extract_text() + "\n"
     
     return text.strip()
-
-if __name__ == "__main__":
-    # Test
-    path = "CV_ManuelNavas_Especialista_IT.pdf"
-    if os.path.exists(path):
-        cv_text = extract_text_from_pdf(path)
-        print(f"Extracted {len(cv_text)} characters from CV.")

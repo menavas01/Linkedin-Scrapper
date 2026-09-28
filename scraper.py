@@ -102,8 +102,3 @@ class LinkedInScraper:
             await browser.close()
             
         return jobs_data
-
-if __name__ == "__main__":
-    scraper = LinkedInScraper()
-    jobs = asyncio.run(scraper.scrape_jobs("Python Developer", max_jobs=2))
-    print(jobs)

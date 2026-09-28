@@ -19,23 +19,58 @@ Este proyecto es un scraper inteligente de LinkedIn impulsado por Inteligencia A
    ```
    *(Si deseas usar otro modelo como `llama3.1`, simplemente cambia la variable `OLLAMA_MODEL` en `llm_matcher.py`)*
 
-## 🛠️ Instalación y Uso
+## 🛠️ Instalación y Configuración
 
-1. Instala las dependencias de Python:
+1. **Clonar el repositorio**:
+   ```bash
+   git clone https://github.com/menavas01/Linkedin-Scrapper.git
+   cd Linkedin-Scrapper
+   ```
+
+2. **Crear y activar un entorno virtual**:
+   ```bash
+   python -m venv venv
+   # En Windows:
+   venv\Scripts\activate
+   # En Linux/Mac:
+   source venv/bin/activate
+   ```
+
+3. **Instalar dependencias de Python**:
    ```bash
    pip install -r requirements.txt
    ```
-2. Instala los navegadores de Playwright:
+
+4. **Instalar los navegadores de Playwright**:
    ```bash
    playwright install chromium
    ```
-3. Ejecuta el proyecto. La forma más fácil es usando el archivo `.bat` incluido:
-   ```bash
-   run.bat
-   ```
-   *Alternativamente, puedes correr `python main.py` directamente si ya tienes el entorno virtual activado.*
 
-4. Abre tu navegador en `http://127.0.0.1:8000`.
+5. **Asegurarte de que Ollama esté corriendo con el modelo**:
+   ```bash
+   ollama pull qwen2.5:14b
+   ```
+
+---
+
+## 💻 ¿Cómo se usa? (Paso a Paso)
+
+1. **Iniciar la aplicación**:
+   - En Windows: Haz doble clic en `run.bat` o ejecuta:
+     ```bash
+     python main.py
+     ```
+2. **Abrir la interfaz web**:
+   - Ve a tu navegador en: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+3. **Fase 1 - Subir tu CV (PDF)**:
+   - Arrastra y suelta o selecciona tu currículum en formato **PDF** directamente en la interfaz.
+   - Haz clic en **"Analyze CV"**. La IA local extraerá automáticamente tus habilidades, tu ubicación y te sugerirá los mejores títulos de puestos acordes a tu perfil.
+4. **Fase 2 - Ajustar parámetros y buscar**:
+   - Revisa o edita los roles sugeridos (separados por coma) y la ubicación geográfica de búsqueda.
+   - Haz clic en **"Start Scraping"**.
+5. **Resultados**:
+   - La herramienta navegará en segundo plano (modo stealth) extrayendo las vacantes más recientes en LinkedIn.
+   - La IA analizará la descripción completa de cada puesto contra tu CV y generará un ranking con un **Score de Compatibilidad (0 a 100)** y una justificación personalizada, junto al enlace directo para postularte.
 
 ## 🏗️ Estructura del Proyecto
 - `main.py`: Servidor FastAPI y lógica de orquestación de las fases.
@@ -44,6 +79,9 @@ Este proyecto es un scraper inteligente de LinkedIn impulsado por Inteligencia A
 - `llm_matcher.py`: Integración con LangChain y Ollama para análisis y scoring.
 - `static/index.html`: La Interfaz de Usuario.
 - `run.bat`: Script de inicio rápido para Windows.
+
+## 📌 Estado del Proyecto
+Este repositorio es una **Prueba de Concepto (PoC) / Proyecto Personal Experimental** desarrollado para explorar la integración de modelos LLM locales con automatización web moderna. No pretende ser un producto comercial ni una solución productiva lista para escala, por lo que está sujeto a mejoras continuas, ajustes en los selectores del scraper ante posibles cambios en la estructura de LinkedIn, y optimizaciones generales en el código.
 
 ## ⚠️ Aviso Legal
 Este proyecto fue creado únicamente con **Fines Educativos**. El web scraping en plataformas como LinkedIn puede ir en contra de sus Términos de Servicio (ToS). Los creadores y contribuidores de este repositorio no se hacen responsables por el mal uso de esta herramienta, el bloqueo de direcciones IP o de cuentas de usuario. Úselo bajo su propia responsabilidad.
